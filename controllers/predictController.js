@@ -1,5 +1,6 @@
 // controllers/predictController.js
 const { getModelInfo, predict } = require("../services/tfModelService");
+const Prediction = require("../model/mongodb"); 
 
 function health(req, res) {
   res.json({
@@ -60,13 +61,18 @@ async function doPredict(req, res) {
       });
     }
 
+    // Ejecutar predicción con TensorFlow
     const prediction = await predict(features);
+
+    // Guardar en MongoDB
+    const doc = new Prediction({ features, result: prediction });
+    await doc.save();
+
     const latencyMs = Date.now() - start;
     const timestamp = new Date().toISOString();
 
-    // De momento sin MongoDB → predictionId null
     res.status(201).json({
-      predictionId: null,
+      predictionId: doc._id,   // ahora devuelve el ID real de MongoDB
       prediction,
       timestamp,
       latencyMs

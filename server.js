@@ -1,6 +1,10 @@
 // server.js
 // Entry point del servicio PREDICT
 
+const connectDB = require("./model/connection");
+require("dotenv").config();
+connectDB();
+
 const express = require("express");
 const path = require("path");
 const predictRoutes = require("./routes/predictRoutes");
